@@ -91,7 +91,10 @@ class SoundGstreamer(Sound):
     def seek(self, position):
         if self._data is None:
             return
-        self._data.seek_simple(gst.FORMAT_TIME, gst.SEEK_FLAG_SKIP,
+        if self._data.get_state()[1] not in (gst.STATE_PLAYING, gst.STATE_PAUSED):
+            self._data.set_state(gst.STATE_PAUSED)
+            self._data.get_state()
+        self._data.seek_simple(gst.FORMAT_TIME, gst.SEEK_FLAG_ACCURATE | gst.SEEK_FLAG_FLUSH,
                                position * 1000000000.)
 
     def _get_volume(self):
